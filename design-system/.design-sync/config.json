@@ -1,0 +1,89 @@
+{
+  "projectId": "0b14da07-369c-4f31-8bce-4910f0c5f88c",
+  "shape": "package",
+  "pkg": "@vokaboka/ui",
+  "globalName": "Vokaboka",
+  "buildCmd": "npm run build",
+  "cssEntry": "dist/index.css",
+  "provider": {
+    "component": "VokabokaRoot",
+    "props": {
+      "style": {
+        "padding": "16px"
+      }
+    }
+  },
+  "docsMap": {
+    "Button": ".design-sync/groups/Actions.md",
+    "Chip": ".design-sync/groups/Actions.md",
+    "AnswerOption": ".design-sync/groups/Actions.md",
+    "WordCard": ".design-sync/groups/Words.md",
+    "WordIcon": ".design-sync/groups/Words.md",
+    "Stars": ".design-sync/groups/Words.md",
+    "GiftBox": ".design-sync/groups/Words.md",
+    "QuestionCard": ".design-sync/groups/Words.md",
+    "Feedback": ".design-sync/groups/Feedback.md",
+    "Toast": ".design-sync/groups/Feedback.md",
+    "SpeechBubble": ".design-sync/groups/Feedback.md",
+    "ProgressDots": ".design-sync/groups/Feedback.md",
+    "Meter": ".design-sync/groups/Feedback.md",
+    "VokabokaRoot": ".design-sync/groups/Layout.md",
+    "Panel": ".design-sync/groups/Layout.md",
+    "TabBar": ".design-sync/groups/Layout.md",
+    "Logo": ".design-sync/groups/Layout.md",
+    "Boka": ".design-sync/groups/World.md",
+    "Character": ".design-sync/groups/World.md",
+    "RoomScene": ".design-sync/groups/World.md",
+    "EditorTabs": ".design-sync/groups/Studio.md",
+    "PillTabs": ".design-sync/groups/Studio.md",
+    "OptionTile": ".design-sync/groups/Studio.md",
+    "Swatches": ".design-sync/groups/Studio.md",
+    "FigureCard": ".design-sync/groups/Studio.md",
+    "AvatarStage": ".design-sync/groups/Studio.md",
+    "RoundButton": ".design-sync/groups/Studio.md",
+    "CtaButton": ".design-sync/groups/Studio.md",
+    "StickerTitle": ".design-sync/groups/Studio.md"
+  },
+  "overrides": {
+    "RoomScene": {
+      "cardMode": "column"
+    },
+    "AvatarStage": {
+      "cardMode": "column"
+    },
+    "EditorTabs": {
+      "cardMode": "column"
+    },
+    "AnswerOption": {
+      "cardMode": "column"
+    },
+    "Feedback": {
+      "cardMode": "column"
+    },
+    "Meter": {
+      "cardMode": "column"
+    },
+    "ProgressDots": {
+      "cardMode": "column"
+    },
+    "TabBar": {
+      "cardMode": "column"
+    },
+    "VokabokaRoot": {
+      "cardMode": "column"
+    },
+    "CtaButton": {
+      "cardMode": "column"
+    },
+    "OptionTile": {
+      "cardMode": "column"
+    },
+    "QuestionCard": {
+      "cardMode": "column"
+    },
+    "WordCard": {
+      "cardMode": "column"
+    }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}
