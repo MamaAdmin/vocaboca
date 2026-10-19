@@ -15,7 +15,7 @@ in dem Möbel und Dinge ihr französisches Wort sprechen.
 - **Koffer** mit allen gesammelten Wörtern und einem Sterne-System.
 - **Avatar-Studio** (Pastel-Streetwear-Look): Haut, Haare, Augen, Gesicht, Oberteile, Hosen, Schuhe, Extras, Zufalls-Look,
   Rückgängig/Wiederholen, bis zu 40 gespeicherte Figuren und 24 fertige Looks.
-- **Das Haus** mit drei Stockwerken, Garten und Treppe. Die Figur läuft zum angetippten Ort und zählt auf der Treppe von
+- **Das Haus** mit drei Stockwerken, Garten und Treppe. Alle Möbel und Dinge sprechen ihr Wort und lassen sich verschieben. Die Figur läuft zum angetippten Ort und zählt auf der Treppe von
   «un» bis «cinq».
 - **Stimme**: 453 vorgesprochene Clips (ElevenLabs, langsam gesprochen) in `voice-fr.json`.
   Vorgelesen wird nur, was man antippt. Wer will, stellt auf der Startseite «Automatisch» ein.

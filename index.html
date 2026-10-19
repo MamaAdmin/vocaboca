@@ -393,6 +393,9 @@ h2.title{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:700}
 .opt{animation:opt-in .4s var(--ease) backwards;animation-delay:calc(var(--i,0)*60ms)}
 @keyframes opt-in{from{opacity:0;translate:0 22px;scale:.94}}
 
+.obj{cursor:grab}
+.obj.lifted{cursor:grabbing;filter:drop-shadow(0 18px 14px rgba(38,34,56,.35))}
+
 /* new Boka mascot (image) */
 .boka{width:calc(150px*var(--s));height:auto;margin:8px auto 0;aspect-ratio:420/373}
 .boka img{display:block;width:100%;height:auto;pointer-events:none;user-select:none;filter:drop-shadow(0 12px 12px rgba(38,34,56,.2))}
@@ -711,10 +714,10 @@ body[data-screen="fig"]{background:var(--ps-bg,#F8F7F4)}
 
 
     <section class="screen" id="s-world" hidden>
-      <div class="worldbar"><button class="roomname" id="roomName"></button><button class="btn small c-grape" id="ovBtn">🗺️ Ganzes Haus</button></div>
+      <div class="worldbar"><button class="roomname" id="roomName"></button><button class="btn small c-grape" id="ovBtn">🗺️ Ganzes Haus</button><button class="mini" id="resetObjBtn">Möbel zurücksetzen</button></div>
       <div class="chips scroll" id="roomChips"></div>
       <div class="roomwrap" id="roomwrap"><div id="world"><div id="housesvghost"></div><div id="layer"></div></div><div class="trash emo" id="trash">🗑️</div></div>
-      <p class="hint" id="worldHint">Tippe auf den Boden: Deine Figur läuft dorthin, über die Treppe auch nach oben. Möbel und Dinge sagen ihr Wort auf Französisch. Tippst du eine andere Figur an, läuft ab jetzt sie.</p>
+      <p class="hint" id="worldHint">Tippe auf den Boden: Deine Figur läuft dorthin, über die Treppe auch nach oben. Möbel und Dinge sagen ihr Wort auf Französisch. Ziehe sie, um sie zu verschieben. Tippst du eine andere Figur an, läuft ab jetzt sie.</p>
       <div class="trayhead"><div class="chips" id="trayTabs"></div></div>
       <div class="tray" id="tray"></div>
     </section>
@@ -867,7 +870,7 @@ function tts(text,lang,done){
 const SAY_OK=["Bravo !","Super !","Très bien !","Génial !","Youpi !","Presque ! Essaie encore.","Coucou !","Bonjour !","Ça va ?","Merci !","On danse ?","Viens !","On y va !","Salut ! Je suis Boka. On joue ?"];
 let BOOK=null;const isBook=t=>{if(!BOOK)BOOK=new Set(ITEMS.map(i=>speakKey(i.fr)));return BOOK.has(speakKey(t))};
 const sayAuto=(...a)=>{if(S&&S.settings&&S.settings.auto)sayFr(...a)};
-function sayFr(...all){const texts=all.filter(t=>isBook(t)||SAY_OK.includes(t));if(!texts.length)return;
+function sayFr(...all){const texts=all.filter(t=>isBook(t)||SAY_OK.includes(t)||VOICE[speakKey(t)]);if(!texts.length)return;
   const my=++seqId;try{curAudio&&curAudio.pause();window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}
   let i=0;const next=()=>{if(my!==seqId||i>=texts.length)return;const k=speakKey(texts[i++]);const uri=VOICE[k];
     if(uri){const a=VEL;a.onended=null;a.muted=false;a.src=uri;a.preservesPitch=true;a.mozPreservesPitch=true;a.webkitPreservesPitch=true;a.playbackRate=voiceRate();curAudio=a;a.onended=()=>setTimeout(next,140);a.play().catch(()=>tts(k,"fr",next));}else tts(k,"fr",next);};
@@ -1573,7 +1576,7 @@ function worldPoint(ev){const wr=$("#world").getBoundingClientRect();return {x:(
 function renderWorld(){
   ensureWorld();
   const host=$("#housesvghost");if(!host.firstChild)host.innerHTML=houseSVG();
-  const svg=$("#housesvg");svg.classList.toggle("night",!!roomState.night);svg.classList.toggle("lampon",!!roomState.lamp);
+  const svg=$("#housesvg");applyObjPos();svg.classList.toggle("night",!!roomState.night);svg.classList.toggle("lampon",!!roomState.lamp);
   if(roomState.fridge)openFridge(true,true);if(roomState.wardrobe)openWardrobe(true,true);
   renderLayer();renderTray();renderRoomChips();updateRoomLabel();
   requestAnimationFrame(()=>{camOnPlayer(true);if(GS&&PL.el)GS.from(PL.el.querySelector(".ci"),{y:-260,duration:.9,ease:"bounce.out"});});
@@ -1681,6 +1684,20 @@ function walkTo(roomK,xp){
     const r=roomAt(w.x,w.y);walkTo(r.k,Math.max(4,Math.min(96,(w.x-r.x)/r.w*100)));
     tapRing(w);});
 })();
+const FIXED_OBJ=["l'escalier","le toit","la porte","la fenêtre","le soleil","le nuage","la maison","la cheminée","l'arbre"];
+const objList=()=>[...document.querySelectorAll("#housesvg .obj")];
+function applyObjPos(){if(!GS)return;const m=S.objPos||{};objList().forEach((g,i)=>{const p=m[i];if(p)GS.set(g,{x:p[0],y:p[1]})})}
+(()=>{const wrap=$("#roomwrap");let d=null;
+  wrap.addEventListener("pointerdown",ev=>{if(!GS||overview||ev.target.closest(".wchar,.witem"))return;const g=ev.target.closest(".obj");
+    if(!g||FIXED_OBJ.includes(g.dataset.fr)){d=null;return}
+    d={g,i:objList().indexOf(g),x0:ev.clientX,y0:ev.clientY,w0:worldPoint(ev),bx:+GS.getProperty(g,"x")||0,by:+GS.getProperty(g,"y")||0,moved:false,id:ev.pointerId}},true);
+  wrap.addEventListener("pointermove",ev=>{if(!d||ev.pointerId!==d.id)return;
+    if(!d.moved){if(Math.hypot(ev.clientX-d.x0,ev.clientY-d.y0)<10)return;d.moved=true;try{wrap.setPointerCapture(ev.pointerId)}catch(e){}d.g.classList.add("lifted");sPop()}
+    const w=worldPoint(ev);GS.set(d.g,{x:d.bx+(w.x-d.w0.x),y:d.by+(w.y-d.w0.y)})});
+  const end=()=>{if(!d)return;if(d.moved){d.g.classList.remove("lifted");S.objPos=S.objPos||{};S.objPos[d.i]=[GS.getProperty(d.g,"x"),GS.getProperty(d.g,"y")];save();sPlop()}d=null};
+  wrap.addEventListener("pointerup",end,true);wrap.addEventListener("pointercancel",end,true);
+  $("#resetObjBtn").onclick=()=>{S.objPos={};objList().forEach(g=>GS&&GS.to(g,{x:0,y:0,duration:.5,ease:"power2.out"}));setTimeout(()=>objList().forEach(g=>GS&&GS.set(g,{x:0,y:0})),700);save();toast("🪑","Alles steht wieder am Platz","")};
+})();
 function tapRing(w){if(!GS)return;const d=document.createElement("div");d.className="ring";setPos(d,w.x,w.y);$("#layer").appendChild(d);GS.fromTo(d,{scale:.2,opacity:1},{scale:1.4,opacity:0,duration:.6,ease:"power2.out",onComplete:()=>d.remove()})}
 function objTap(g,w){
   const fr=g.dataset.fr,de=g.dataset.de,act=g.dataset.act,svg=$("#housesvg");
@@ -1697,7 +1714,7 @@ function objTap(g,w){
     if(GS)GS.fromTo([t,t2],{opacity:0},{opacity:1,duration:.5});sayFr(it.fr);bubbleWorld(w.x,w.y-40,it.fr,it.de);return}
   if(GS)GS.fromTo(g,{scale:1},{scale:1.08,duration:.14,yoyo:true,repeat:1,transformOrigin:"50% 100%",ease:"power1.out"});
   if(act==="nose"){sayFr(fr,"Pour le nez, je prends une carotte.");bubbleWorld(w.x,w.y-40,"Pour le nez, je prends une carotte.","Für die Nase nehme ich eine Karotte.");return}
-  if(isBook(fr)){sayFr(fr);bubbleWorld(w.x,w.y-40,fr,de);}else bubbleWorld(w.x,w.y-40,de,"");
+  if(isBook(fr)||VOICE[speakKey(fr)]){sayFr(fr);bubbleWorld(w.x,w.y-40,fr,de);}else bubbleWorld(w.x,w.y-40,de,"");
 }
 function openWardrobe(open,instant){const l=$("#housesvg .doorL"),r=$("#housesvg .doorR");if(!l)return;
   if(GS){GS.to(l,{scaleX:open?.12:1,transformOrigin:"0% 50%",duration:instant?0:.6,ease:open?"back.out(1.6)":"power2.inOut"});GS.to(r,{scaleX:open?.12:1,transformOrigin:"100% 50%",duration:instant?0:.6,ease:open?"back.out(1.6)":"power2.inOut"});}
